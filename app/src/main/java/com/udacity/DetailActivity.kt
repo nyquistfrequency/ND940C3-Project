@@ -1,5 +1,6 @@
 package com.udacity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.udacity.databinding.ActivityDetailBinding
@@ -13,5 +14,18 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+
+        val fileName = intent.getStringExtra("fileName")
+        val status = intent.getStringExtra("status")
+
+        binding.fileNameText.text = fileName
+        binding.statusText.text = status
+
+        binding.okButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
+
 }

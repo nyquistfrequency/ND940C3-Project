@@ -41,6 +41,7 @@ class LoadingButton @JvmOverloads constructor(
                     invalidate() // don't fully understand why it needs to be here but if I put it outside of the addUpdateListener it doesn't animate correctly
                 }
                 valueAnimator.disableViewDuringAnimation(this) // Disable the button during the animation
+                valueAnimator.repeatCount = 1000
                 valueAnimator.start()
 
                 // Testing only: Transition to "ButtonState.Completed" before having the downloader implemented

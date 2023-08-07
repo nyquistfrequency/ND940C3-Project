@@ -29,10 +29,9 @@ class MainActivity : AppCompatActivity() {
     private var downloadID: Long = 0
     private val notificationID = 0
 
+    private lateinit var radioButton: RadioButton
 
     private lateinit var notificationManager: NotificationManager
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var action: NotificationCompat.Action
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         val radioGroup = findViewById<RadioGroup>(R.id.download_radio_group)
         radioGroup.setOnCheckedChangeListener { group, checkedId ->
-            val radioButton = findViewById<RadioButton>(checkedId)
+            radioButton = findViewById(checkedId)
             radioButtonSelection(radioButton)
         }
 
@@ -65,8 +64,8 @@ class MainActivity : AppCompatActivity() {
                 val radioButton = findViewById<RadioButton>(selectedRadioButtonId)
                 val url =
                     radioButtonSelection(radioButton) // Retrieve the URL from radioButtonSelection()
-                Toast.makeText(this, url, Toast.LENGTH_SHORT).show() // check for used URL
-                download(url) // Pass the URL to the download() function
+                // Toast.makeText(this, url, Toast.LENGTH_SHORT).show() // check for used URL
+                download(url.uri) // Pass the URL to the download() function
             }
         }
     }
@@ -79,24 +78,28 @@ class MainActivity : AppCompatActivity() {
                 val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
                 val query = DownloadManager.Query().setFilterById(downloadID)
                 val cursor = downloadManager.query(query)
+                notificationManager = getSystemService(NotificationManager::class.java)
                 if (cursor.moveToFirst()) {
                     val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                    downloadStatus = if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                        "Success"
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                        downloadStatus = "Success"
+                        notificationManager.sendNotification(
+                            "Download complete!",
+                            applicationContext,
+                            downloadStatus,
+                            radioButtonSelection(radioButton).fileName)
                     } else {
-                        "Failed"
+                        downloadStatus = "Failed"
+                        notificationManager.sendNotification(
+                            "Download unsuccessful!",
+                            applicationContext,
+                            downloadStatus,
+                            radioButtonSelection(radioButton).fileName)
                     }
                 }
-                cursor.close()
 
-                notificationManager = getSystemService(NotificationManager::class.java)
-                notificationManager.sendNotification(
-                    "Download complete!",
-                    applicationContext,
-                    downloadStatus
-                )
-                loadingButton.buttonState = ButtonState.Completed
             }
+            loadingButton.buttonState = ButtonState.Completed
         }
     }
 
@@ -115,14 +118,23 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun radioButtonSelection(radioButton: RadioButton): String {
+    private fun radioButtonSelection(radioButton: RadioButton): URL {
         return when (radioButton.id) {
-            R.id.glide_radio_selection -> URL.GLIDE_URI.uri
-            R.id.loadapp_radio_selection -> URL.UDACITY_PROJECT_URI.uri
-            R.id.retrofit_radio_selection -> URL.RETROFIT_URI.uri
-            else -> ""
+            R.id.glide_radio_selection -> URL.GLIDE_URI
+            R.id.loadapp_radio_selection -> URL.UDACITY_PROJECT_URI
+            R.id.retrofit_radio_selection -> URL.RETROFIT_URI
+            else -> URL.GLIDE_URI
         }
     }
+
+//    private fun radioButtonSelection(radioButton: RadioButton): String {
+//        return when (radioButton.id) {
+//            R.id.glide_radio_selection -> URL.GLIDE_URI.uri
+//            R.id.loadapp_radio_selection -> URL.UDACITY_PROJECT_URI.uri
+//            R.id.retrofit_radio_selection -> URL.RETROFIT_URI.uri
+//            else -> ""
+//        }
+//    }
 
     private fun createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -143,13 +155,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun NotificationManager.sendNotification(
-        messageBody: String,
+        notificationTitle: String,
         applicationContext: Context,
-        status: String
+        status: String,
+        fileName: String
     ) {
 
-        val contentIntent = Intent(applicationContext, MainActivity::class.java)
-        contentIntent.putExtra("fileName", "Test") //ToDo
+        val contentIntent = Intent(applicationContext, DetailActivity::class.java)
+        contentIntent.putExtra("fileName", fileName)
         contentIntent.putExtra("status", status)
 
         val contentPendingIntent = PendingIntent.getActivity(
@@ -166,7 +179,7 @@ class MainActivity : AppCompatActivity() {
             applicationContext,
             applicationContext.getString(R.string.repo_notification_channel_id)
         )
-            .setContentTitle("Test")
+            .setContentTitle(notificationTitle)
             .setContentText(status)
             .setContentIntent(contentPendingIntent)
             .setAutoCancel(true)
@@ -178,18 +191,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private enum class URL(val uri: String, val notificationTitle: String) {
+        private enum class URL(val uri: String, val fileName: String) {
             GLIDE_URI(
-                "https://github.com/bumptech/glide/archive/master.zip",
-                "The glide repository is downloaded"
+                "https://github.com/bumptech/glide/archive/refs/heads/master.zip",
+                "Glide - Image loading library by BumpTech"
             ),
             UDACITY_PROJECT_URI(
-                "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip",
-                "The project 3 repository is downloaded"
+                "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/refs/heads/master.zip",
+                "LoadApp - Current repository by Udacity"
             ),
             RETROFIT_URI(
-                "https://github.com/square/retrofit/archive/master.zip",
-                "The retrofit repository is downloaded"
+                "https://github.com/square/retrofit/archive/refs/heads/master.zip",
+                "Retrofit - Type-safe HTTP client for Android and Java by Square, Inc"
             )
         }
     }
