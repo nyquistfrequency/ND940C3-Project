@@ -4,13 +4,55 @@
 
     <ConstraintSet android:id="@+id/start">
         <Constraint
-            />
+            android:id="@+id/fileNameText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/fileNameTitle"
+            app:layout_constraintTop_toTopOf="@+id/fileNameTitle"
+            android:alpha="0.0" />
+
+        <Constraint
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="36dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/fileNameTitle"
+            app:layout_constraintTop_toBottomOf="@+id/fileNameText"
+            android:alpha="0.0" />
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:id="@+id/fileNameText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/fileNameTitle"
+            app:layout_constraintTop_toTopOf="@+id/fileNameTitle"
+            android:alpha="1.0" />
+
+        <Constraint
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="36dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/fileNameTitle"
+            app:layout_constraintTop_toBottomOf="@+id/fileNameText"
+            android:alpha="1.0" />
     </ConstraintSet>
 
     <Transition
         app:constraintSetEnd="@id/end"
-        app:constraintSetStart="@+id/start" />
+        app:constraintSetStart="@+id/start"
+        app:autoTransition="animateToEnd"
+        app:duration="3000" />
 </MotionScene>

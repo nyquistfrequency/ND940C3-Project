@@ -18,8 +18,8 @@ class DetailActivity : AppCompatActivity() {
         val fileName = intent.getStringExtra("fileName")
         val status = intent.getStringExtra("status")
 
-        binding.fileNameText.text = fileName
-        binding.statusText.text = status
+        binding.contentDetail.fileNameText.text = fileName
+        binding.contentDetail.statusText.text = status
 
         binding.okButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
