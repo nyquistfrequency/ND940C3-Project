@@ -7,7 +7,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
-import android.os.Handler
 import android.util.AttributeSet
 import android.view.View
 import kotlin.properties.Delegates
@@ -43,11 +42,6 @@ class LoadingButton @JvmOverloads constructor(
                 valueAnimator.disableViewDuringAnimation(this) // Disable the button during the animation
                 valueAnimator.repeatCount = 1000
                 valueAnimator.start()
-
-                // Testing only: Transition to "ButtonState.Completed" before having the downloader implemented
-//                Handler().postDelayed({
-//                    buttonState = ButtonState.Completed
-//                }, valueAnimator.duration)
 
             }
             ButtonState.Completed -> {
@@ -146,7 +140,7 @@ class LoadingButton @JvmOverloads constructor(
 
     private fun drawProgressCircle(canvas: Canvas?){
         paint.color = loadingCircleColor
-        val centerX = (widthSize / 2).toFloat() + paint.measureText(buttonText)
+        val centerX = (widthSize / 2).toFloat() + (widthSize - paint.measureText(buttonText)) / 2
         val centerY = heightSize / 2f
         val radius = minOf(widthSize, heightSize) / 4f
 
